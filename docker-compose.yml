@@ -13,5 +13,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_NAME: book_crud_db
+      PORT: 8080
+    depends_on:
+      - db
+
 volumes:
   postgres_data:
