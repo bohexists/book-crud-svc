@@ -10,6 +10,7 @@ import (
 	"github.com/bohexists/book-crud-svc/models"
 )
 
+// GetBooks retrieves all books from the database
 func GetBooks(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.DB.Query("SELECT id, title, author, published FROM books")
 	if err != nil {
@@ -34,6 +35,7 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(bookList)
 }
 
+// GetBook retrieves a single book from the database
 func GetBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -53,6 +55,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
+// CreateBook creates a new book in the database
 func CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book models.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
@@ -71,6 +74,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(book)
 }
 
+// UpdateBook updates an existing book in the database
 func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -95,6 +99,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// DeleteBook deletes a book from the database
 func DeleteBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
