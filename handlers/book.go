@@ -2,16 +2,33 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/gorilla/mux"
+	"github.com/patrickmn/go-cache"
 
 	"github.com/bohexists/book-crud-svc/db"
 	"github.com/bohexists/book-crud-svc/models"
 )
 
+// c is a global cache
+var c = cache.New(5*time.Minute, 10*time.Minute)
+
 // GetBooks retrieves all books from the database
 func GetBooks(w http.ResponseWriter, r *http.Request) {
+
+	// If the data is in the cache, return it
+	if x, found := c.Get("books"); found {
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(x); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// If the data is not in the cache, query the database
 	rows, err := db.DB.Query("SELECT id, title, author, published FROM books")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -31,6 +48,9 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 		bookList.AddBook(book)
 	}
 
+	// Add the data to the cache
+	c.Set("books", bookList, cache.DefaultExpiration)
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(bookList); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -48,12 +68,25 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// If the data is in the cache, return it
+	if x, found := c.Get("book_" + strconv.Itoa(id)); found {
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(x); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+
+	// If the data is not in the cache, query the database
 	var book models.Book
 	err = db.DB.QueryRow("SELECT id, title, author, published FROM books WHERE id=$1", id).Scan(&book.ID, &book.Title, &book.Author, &book.Published)
 	if err != nil {
 		http.Error(w, "Book not found", http.StatusNotFound)
 		return
 	}
+
+	// Add the data to the cache
+	c.Set("book_"+strconv.Itoa(id), book, cache.DefaultExpiration)
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(book); err != nil {
