@@ -1,0 +1,9 @@
+linters:
+  enable-all: true
+  disable:
+    - gocyclo # Too many closures
+
+run:
+  timeout: 5m
+issues:
+  exclude-use-default: false

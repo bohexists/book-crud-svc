@@ -1,6 +1,6 @@
 module github.com/bohexists/book-crud-svc
 
-go 1.20
+go 1.22.0
 
 require (
 	github.com/gorilla/mux v1.8.1
