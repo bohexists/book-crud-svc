@@ -10,3 +10,11 @@ type Book struct {
 	Published   time.Time `json:"published"`
 	Price       int       `json:"price"`
 }
+
+type BookList struct {
+	Books []Book `json:"books"`
+}
+
+func (bl *BookList) AddBook(book Book) {
+	bl.Books = append(bl.Books, book)
+}
