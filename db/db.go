@@ -15,12 +15,15 @@ var DB *sql.DB
 
 func InitDB() {
 
-	// Load environment variables from .env file
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("Error loading .env file")
+	envFile := ".env"
+	if testingMode := os.Getenv("TESTING"); testingMode == "true" {
+		envFile = ".env.test"
 	}
 
+	err := godotenv.Load(envFile)
+	if err != nil {
+		log.Fatalf("Error loading %s file", envFile)
+	}
 	// Connect to the database
 	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),

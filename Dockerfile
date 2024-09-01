@@ -34,4 +34,5 @@ RUN go build -o main .
 ENV PORT=8080
 
 # Command to run the application
-CMD ["sh", "-c", "dockerize -wait tcp://db:5432 -timeout 60s && go test -v ./... && ./main"]
+#CMD ["sh", "-c", "dockerize -wait tcp://db:5432 -timeout 60s && go test -v ./... && ./main"]
+CMD ["sh", "-c", "dockerize -wait tcp://db:5432 -timeout 60s && ./main"]
