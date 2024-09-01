@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/bohexists/book-crud-svc/auth"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 
@@ -29,11 +30,12 @@ func main() {
 	r := mux.NewRouter()
 
 	// Define routes
-	r.HandleFunc("/books", handlers.GetBooks).Methods("GET")
-	r.HandleFunc("/books/{id:[0-9]+}", handlers.GetBook).Methods("GET")
-	r.HandleFunc("/books", handlers.CreateBook).Methods("POST")
-	r.HandleFunc("/books/{id:[0-9]+}", handlers.UpdateBook).Methods("PUT")
-	r.HandleFunc("/books/{id:[0-9]+}", handlers.DeleteBook).Methods("DELETE")
+	r.HandleFunc("/login", auth.Login).Methods("POST")
+	r.HandleFunc("/books", auth.AuthenticateJWT(handlers.GetBooks)).Methods("GET")
+	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.GetBook)).Methods("GET")
+	r.HandleFunc("/books", auth.AuthenticateJWT(handlers.CreateBook)).Methods("POST")
+	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.UpdateBook)).Methods("PUT")
+	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.DeleteBook)).Methods("DELETE")
 
 	// Start the server
 	log.Println("Server is running on port", os.Getenv("PORT"))
