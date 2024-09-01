@@ -24,8 +24,12 @@ services:
       DB_PASSWORD: password
       DB_NAME: book_crud_db
       PORT: 8080
+    volumes:
+      - .env:/app/.env
     depends_on:
       - db
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
