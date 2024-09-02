@@ -30,12 +30,12 @@ func main() {
 	r := mux.NewRouter()
 
 	// Define routes
-	r.HandleFunc("/login", auth.Login).Methods("POST")
-	r.HandleFunc("/books", auth.AuthenticateJWT(handlers.GetBooks)).Methods("GET")
-	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.GetBook)).Methods("GET")
-	r.HandleFunc("/books", auth.AuthenticateJWT(handlers.CreateBook)).Methods("POST")
-	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.UpdateBook)).Methods("PUT")
-	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.DeleteBook)).Methods("DELETE")
+	r.HandleFunc("/login", auth.Login).Methods("POST")                                              // Login route
+	r.HandleFunc("/books", auth.AuthenticateJWT(handlers.GetBooks)).Methods("GET")                  // Get books route
+	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.GetBook)).Methods("GET")       // Get book route
+	r.HandleFunc("/books", auth.AuthenticateJWT(handlers.CreateBook)).Methods("POST")               // Create book route
+	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.UpdateBook)).Methods("PUT")    // Update book route
+	r.HandleFunc("/books/{id:[0-9]+}", auth.AuthenticateJWT(handlers.DeleteBook)).Methods("DELETE") // Delete book route
 
 	// Start the server
 	log.Println("Server is running on port", os.Getenv("PORT"))

@@ -15,11 +15,13 @@ var DB *sql.DB
 
 func InitDB() {
 
+	// Connect to testing database if in testing mode
 	envFile := ".env"
 	if testingMode := os.Getenv("TESTING"); testingMode == "true" {
 		envFile = ".env.test"
 	}
 
+	// Load environment variables
 	err := godotenv.Load(envFile)
 	if err != nil {
 		log.Fatalf("Error loading %s file", envFile)

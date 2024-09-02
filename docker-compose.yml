@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Run the PostgreSQL database
   db:
     image: postgres:14
     container_name: book_crud_db
@@ -13,6 +14,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  # Run the application
   app:
     build: .
     ports:

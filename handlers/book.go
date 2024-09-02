@@ -38,6 +38,7 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 
 	var bookList models.BookList
 
+	// Add the data to the cache
 	for rows.Next() {
 		var book models.Book
 		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Published); err != nil {
@@ -51,6 +52,7 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 	// Add the data to the cache
 	c.Set("books", bookList, cache.DefaultExpiration)
 
+	// Add the data to response
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(bookList); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -103,6 +105,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Insert the book
 	err := db.DB.QueryRow("INSERT INTO books (title, author, published) VALUES ($1, $2, $3) RETURNING id",
 		book.Title, book.Author, book.Published).Scan(&book.ID)
 	if err != nil {
@@ -110,6 +113,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Add the data to the cache
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(book); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -125,13 +129,14 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
 	}
-
+	// Check if the book exists
 	var book models.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	// Update the book
 	_, err = db.DB.Exec("UPDATE books SET title=$1, author=$2, published=$3 WHERE id=$4",
 		book.Title, book.Author, book.Published, id)
 	if err != nil {
@@ -150,7 +155,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
 	}
-
+	// Delete the book
 	_, err = db.DB.Exec("DELETE FROM books WHERE id=$1", id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
