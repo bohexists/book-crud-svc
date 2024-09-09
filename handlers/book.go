@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/bohexists/book-crud-svc/internal/domain"
 	"net/http"
 	"strconv"
 	"time"
@@ -10,7 +11,6 @@ import (
 	"github.com/patrickmn/go-cache"
 
 	"github.com/bohexists/book-crud-svc/db"
-	"github.com/bohexists/book-crud-svc/models"
 )
 
 // c is a global cache
@@ -36,11 +36,11 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	var bookList models.BookList
+	var bookList domain.BookList
 
 	// Add the data to the cache
 	for rows.Next() {
-		var book models.Book
+		var book domain.Book
 		if err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Published); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -80,7 +80,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the data is not in the cache, query the database
-	var book models.Book
+	var book domain.Book
 	err = db.DB.QueryRow("SELECT id, title, author, published FROM books WHERE id=$1", id).Scan(&book.ID, &book.Title, &book.Author, &book.Published)
 	if err != nil {
 		http.Error(w, "Book not found", http.StatusNotFound)
@@ -99,7 +99,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 
 // CreateBook creates a new book in the database
 func CreateBook(w http.ResponseWriter, r *http.Request) {
-	var book models.Book
+	var book domain.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -130,7 +130,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Check if the book exists
-	var book models.Book
+	var book domain.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

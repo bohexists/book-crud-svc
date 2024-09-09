@@ -134,7 +134,7 @@ func TestMain(m *testing.M) {
 //	}
 //
 //	// Check the response
-//	var updatedBook models.Book
+//	var updatedBook domain.Book
 //	err = db.DB.QueryRow("SELECT id, title, author, published, description, price FROM books WHERE id = 1").Scan(&updatedBook.ID, &updatedBook.Title, &updatedBook.Author, &updatedBook.Published, &updatedBook.Description, &updatedBook.Price)
 //	if err != nil {
 //		t.Fatal(err)
@@ -171,7 +171,7 @@ func TestMain(m *testing.M) {
 //	}
 //
 //	// Check the response
-//	var deletedBook models.Book
+//	var deletedBook domain.Book
 //	err = db.DB.QueryRow("SELECT id, title FROM books WHERE id = 1").Scan(&deletedBook.ID, &deletedBook.Title)
 //	if err == nil {
 //		t.Errorf("book not deleted: found book with ID 1")
