@@ -6,10 +6,16 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func NewRouter() *mux.Router {
+type BookHandler struct {
+	Service *service.BookService
+}
+
+func NewRouter(bookService *service.BookService) *mux.Router {
 	// Create a new router
 	var r *mux.Router
 	r = mux.NewRouter()
+
+	bookHandler := &BookHandler{Service: bookService}
 
 	r.HandleFunc("/login", middleware.Login).Methods("POST")                                             // Login route
 	r.HandleFunc("/books", middleware.AuthenticateJWT(service.GetBooks)).Methods("GET")                  // Get books route

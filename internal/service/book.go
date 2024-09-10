@@ -12,6 +12,19 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
+type BookService struct {
+	repo *repository.BookRepository
+}
+
+func NewBookService(repo *repository.BookRepository) *BookService {
+	return &BookService{repo: repo}
+}
+
+func (s *BookService) GetBooks() ([]domain.Book, error) {
+	return s.repo.GetBooks()
+}
+
+// ///////////////////
 // c is a global cache
 var c = cache.New(5*time.Minute, 10*time.Minute)
 

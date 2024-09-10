@@ -11,9 +11,9 @@ import (
 )
 
 // DB is the global database connection
-var DB *sql.DB
+var db *sql.DB
 
-func InitDB() {
+func SetupDatabase() *sql.DB {
 
 	// Connect to testing database if in testing mode
 	envFile := ".env"
@@ -35,15 +35,17 @@ func InitDB() {
 		os.Getenv("DB_NAME"))
 
 	// Open the connection
-	DB, err = sql.Open("postgres", connStr)
+	db, err = sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Test the connection
-	if err = DB.Ping(); err != nil {
+	if err = db.Ping(); err != nil {
 		log.Fatal(err)
 	}
 	// Print a success message
 	fmt.Println("Database connection established")
+
+	return db
 }
