@@ -1,16 +1,15 @@
-package handlers
+package service
 
 import (
 	"encoding/json"
 	"github.com/bohexists/book-crud-svc/internal/domain"
+	"github.com/bohexists/book-crud-svc/internal/repository"
 	"net/http"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/patrickmn/go-cache"
-
-	"github.com/bohexists/book-crud-svc/db"
 )
 
 // c is a global cache
@@ -29,7 +28,7 @@ func GetBooks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If the data is not in the cache, query the database
-	rows, err := db.DB.Query("SELECT id, title, author, published FROM books")
+	rows, err := repository.DB.Query("SELECT id, title, author, published FROM books")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -81,7 +80,7 @@ func GetBook(w http.ResponseWriter, r *http.Request) {
 
 	// If the data is not in the cache, query the database
 	var book domain.Book
-	err = db.DB.QueryRow("SELECT id, title, author, published FROM books WHERE id=$1", id).Scan(&book.ID, &book.Title, &book.Author, &book.Published)
+	err = repository.DB.QueryRow("SELECT id, title, author, published FROM books WHERE id=$1", id).Scan(&book.ID, &book.Title, &book.Author, &book.Published)
 	if err != nil {
 		http.Error(w, "Book not found", http.StatusNotFound)
 		return
@@ -106,7 +105,7 @@ func CreateBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Insert the book
-	err := db.DB.QueryRow("INSERT INTO books (title, author, published) VALUES ($1, $2, $3) RETURNING id",
+	err := repository.DB.QueryRow("INSERT INTO books (title, author, published) VALUES ($1, $2, $3) RETURNING id",
 		book.Title, book.Author, book.Published).Scan(&book.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -137,7 +136,7 @@ func UpdateBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update the book
-	_, err = db.DB.Exec("UPDATE books SET title=$1, author=$2, published=$3 WHERE id=$4",
+	_, err = repository.DB.Exec("UPDATE books SET title=$1, author=$2, published=$3 WHERE id=$4",
 		book.Title, book.Author, book.Published, id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -156,7 +155,7 @@ func DeleteBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Delete the book
-	_, err = db.DB.Exec("DELETE FROM books WHERE id=$1", id)
+	_, err = repository.DB.Exec("DELETE FROM books WHERE id=$1", id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
