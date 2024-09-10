@@ -15,6 +15,9 @@ import (
 
 func main() {
 	// Load environment variables from .env file
+	cwd, _ := os.Getwd()
+	log.Println("Current working directory:", cwd)
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

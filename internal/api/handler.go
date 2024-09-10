@@ -22,7 +22,15 @@ func NewBookHandler(service *service.BookService) *BookHandler {
 	}
 }
 
-// GetBooks processes a request to get all books
+// GetBooks godoc
+// @Summary Get all books
+// @Description Get all books from the database
+// @Tags books
+// @Accept json
+// @Produce json
+// @Success 200 {array} domain.Book
+// @Router /books [get]
+// @Security ApiKeyAuth
 func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	books, err := h.Service.GetBooks()
 	if err != nil {
@@ -32,7 +40,16 @@ func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	responseWithJSON(w, books, http.StatusOK)
 }
 
-// GetBook processes a request to get a specific book
+// GetBook godoc
+// @Summary Get a book by ID
+// @Description Get a specific book by its ID
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 200 {object} domain.Book
+// @Router /books/{id} [get]
+// @Security ApiKeyAuth
 func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -48,7 +65,16 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	responseWithJSON(w, book, http.StatusOK)
 }
 
-// CreateBook processes a request to create a new book
+// CreateBook godoc
+// @Summary Create a new book
+// @Description Create a new book with the provided information
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param book body domain.Book true "Create Book"
+// @Success 201 {object} domain.Book
+// @Router /books [post]
+// @Security ApiKeyAuth
 func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book domain.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
@@ -63,7 +89,17 @@ func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	responseWithJSON(w, createdBook, http.StatusCreated)
 }
 
-// UpdateBook processes a request to update a book
+// UpdateBook godoc
+// @Summary Update an existing book
+// @Description Update a book with specified ID
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Param book body domain.Book true "Update Book"
+// @Success 204
+// @Router /books/{id} [put]
+// @Security ApiKeyAuth
 func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -84,7 +120,16 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// DeleteBook processes a request to delete a book
+// DeleteBook godoc
+// @Summary Delete a book
+// @Description Delete a book by its ID
+// @Tags books
+// @Accept json
+// @Produce json
+// @Param id path int true "Book ID"
+// @Success 204
+// @Router /books/{id} [delete]
+// @Security ApiKeyAuth
 func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
