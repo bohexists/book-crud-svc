@@ -1,14 +1,13 @@
 package service
 
 import (
-	"github.com/bohexists/book-crud-svc/internal/repository"
 	"testing"
 )
 
 // TestMain sets up the database before running tests
 func TestMain(m *testing.M) {
 	// Initialize the database connection
-	repository.InitDB()
+	//repository.InitDB()
 
 	// Start the tests
 	m.Run()

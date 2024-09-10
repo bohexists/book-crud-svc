@@ -3,45 +3,69 @@ package repository
 import (
 	"database/sql"
 	"github.com/bohexists/book-crud-svc/internal/domain"
-	"log"
 )
 
-// BookRepository is a repository for books
+// BookRepository структура для работы с базой данных по книгам
 type BookRepository struct {
-	db *sql.DB
+	DB *sql.DB
 }
 
-// NewBookRepository creates a new BookRepository
+// NewBookRepository создает новый экземпляр BookRepository
 func NewBookRepository(db *sql.DB) *BookRepository {
-	return &BookRepository{db: db}
+	return &BookRepository{
+		DB: db,
+	}
 }
 
-// GetBooks retrieves all books from the database
+// GetBooks извлекает все книги из базы данных
 func (r *BookRepository) GetBooks() ([]domain.Book, error) {
-	books := []domain.Book{}
-	// Execute the query
-	query := "SELECT id, title, description, author, published, price FROM books"
-	rows, err := r.db.Query(query)
+	rows, err := r.DB.Query("SELECT id, title, description, author, published, price FROM books")
 	if err != nil {
 		return nil, err
 	}
-	// Close the rows when the function returns
 	defer rows.Close()
-	// Iterate through the rows, using Scan to assign column data to struct fields.
+
+	var books []domain.Book
 	for rows.Next() {
 		var book domain.Book
-		err := rows.Scan(&book.ID, &book.Title, &book.Description, &book.Author, &book.Published, &book.Price)
-		if err != nil {
-			log.Println("Error scanning book:", err)
-			continue
+		if err := rows.Scan(&book.ID, &book.Title, &book.Description, &book.Author, &book.Published, &book.Price); err != nil {
+			return nil, err
 		}
-		// Add the book to the list
 		books = append(books, book)
 	}
-	// Check for any errors during iteration
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	// Return the list of books
 	return books, nil
+}
+
+// GetBook извлекает одну книгу по ID
+func (r *BookRepository) GetBook(id int) (domain.Book, error) {
+	var book domain.Book
+	err := r.DB.QueryRow("SELECT id, title, description, author, published, price FROM books WHERE id = $1", id).Scan(
+		&book.ID, &book.Title, &book.Description, &book.Author, &book.Published, &book.Price)
+	if err != nil {
+		return domain.Book{}, err
+	}
+	return book, nil
+}
+
+// CreateBook добавляет новую книгу в базу данных
+func (r *BookRepository) CreateBook(book domain.Book) (domain.Book, error) {
+	err := r.DB.QueryRow("INSERT INTO books (title, description, author, published, price) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		book.Title, book.Description, book.Author, book.Published, book.Price).Scan(&book.ID)
+	if err != nil {
+		return domain.Book{}, err
+	}
+	return book, nil
+}
+
+// UpdateBook обновляет существующую книгу
+func (r *BookRepository) UpdateBook(id int, book domain.Book) error {
+	_, err := r.DB.Exec("UPDATE books SET title=$1, description=$2, author=$3, published=$4, price=$5 WHERE id=$6",
+		book.Title, book.Description, book.Author, book.Published, book.Price, id)
+	return err
+}
+
+// DeleteBook удаляет книгу по ID
+func (r *BookRepository) DeleteBook(id int) error {
+	_, err := r.DB.Exec("DELETE FROM books WHERE id = $1", id)
+	return err
 }

@@ -19,6 +19,7 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
 	// Initialize the database connection
 	db := repository.SetupDatabase()
 	// Create a new repository
@@ -27,6 +28,7 @@ func main() {
 	bookService := service.NewBookService(repo)
 	// Create a new router
 	router := api.NewRouter(bookService)
+
 	// Start the server
 	log.Println("Server is running on port", os.Getenv("PORT"))
 	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), router))
