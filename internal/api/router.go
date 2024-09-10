@@ -15,6 +15,8 @@ import (
 	"github.com/bohexists/book-crud-svc/internal/service"
 	httpSwagger "github.com/swaggo/http-swagger"
 
+	_ "github.com/bohexists/book-crud-svc/docs"
+
 	"github.com/gorilla/mux"
 )
 
@@ -27,7 +29,9 @@ func NewRouter(bookService *service.BookService) *mux.Router {
 	bookHandler := &BookHandler{Service: bookService}
 
 	// Serve swagger docs
-	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+	r.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
 
 	// Register routes
 	r.HandleFunc("/login", middleware.Login).Methods("POST")

@@ -10,11 +10,12 @@ import (
 	"net/http"
 	"os"
 
+	_ "github.com/bohexists/book-crud-svc/docs"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	// Load environment variables from .env file
+
 	cwd, _ := os.Getwd()
 	log.Println("Current working directory:", cwd)
 
