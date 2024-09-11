@@ -1,4 +1,4 @@
-// Package main - Book Management API
+// Package api - Book Management API
 // @title Book Management API
 // @description This is a sample server for managing books.
 // @version 1.0

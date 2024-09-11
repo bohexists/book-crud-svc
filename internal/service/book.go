@@ -2,19 +2,26 @@ package service
 
 import (
 	"github.com/bohexists/book-crud-svc/internal/domain"
-	"github.com/bohexists/book-crud-svc/internal/repository"
 )
 
 // BookService service for books
 type BookService struct {
-	Repo *repository.BookRepository
+	Repo BookServiceInterface
 }
 
 // NewBookService creates a new BookService
-func NewBookService(repo *repository.BookRepository) *BookService {
+func NewBookService(repo BookServiceInterface) *BookService {
 	return &BookService{
 		Repo: repo,
 	}
+}
+
+type BookServiceInterface interface {
+	GetBooks() ([]domain.Book, error)
+	GetBook(id int) (domain.Book, error)
+	CreateBook(book domain.Book) (domain.Book, error)
+	UpdateBook(id int, book domain.Book) error
+	DeleteBook(id int) error
 }
 
 // GetBooks returns all books
