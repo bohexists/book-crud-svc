@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 
@@ -12,13 +13,15 @@ import (
 
 // BookHandler is a handler for books
 type BookHandler struct {
-	Service *service.BookService
+	Service BookServiceInterface
+	Log     *logrus.Logger
 }
 
 // NewBookHandler creates a new BookHandler
-func NewBookHandler(service *service.BookService) *BookHandler {
+func NewBookHandler(service *service.BookService, log *logrus.Logger) *BookHandler {
 	return &BookHandler{
 		Service: service,
+		Log:     log,
 	}
 }
 
@@ -42,10 +45,11 @@ type BookServiceInterface interface {
 func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	books, err := h.Service.GetBooks()
 	if err != nil {
+		h.Log.WithError(err).Error("Failed to fetch books")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	responseWithJSON(w, books, http.StatusOK)
+	h.responseWithJSON(w, books, http.StatusOK)
 }
 
 // GetBook godoc
@@ -62,15 +66,17 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
+		h.Log.WithError(err).Error("Invalid book ID")
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
 	}
 	book, err := h.Service.GetBook(id)
 	if err != nil {
+		h.Log.WithError(err).WithField("book_id", id).Error("Book not found")
 		http.Error(w, "Book not found", http.StatusNotFound)
 		return
 	}
-	responseWithJSON(w, book, http.StatusOK)
+	h.responseWithJSON(w, book, http.StatusOK)
 }
 
 // CreateBook godoc
@@ -86,15 +92,17 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	var book domain.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
+		h.Log.WithError(err).Error("Invalid request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 	createdBook, err := h.Service.CreateBook(book)
 	if err != nil {
+		h.Log.WithError(err).Error("Failed to create book")
 		http.Error(w, "Error creating book", http.StatusInternalServerError)
 		return
 	}
-	responseWithJSON(w, createdBook, http.StatusCreated)
+	h.responseWithJSON(w, createdBook, http.StatusCreated)
 }
 
 // UpdateBook godoc
@@ -112,16 +120,19 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
+		h.Log.WithError(err).Error("Invalid book ID")
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
 	}
 	var book domain.Book
 	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
+		h.Log.WithError(err).Error("Invalid request body")
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 	err = h.Service.UpdateBook(id, book)
 	if err != nil {
+		h.Log.WithError(err).WithField("book_id", id).Error("Failed to update book")
 		http.Error(w, "Error updating book", http.StatusInternalServerError)
 		return
 	}
@@ -142,10 +153,12 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
+		h.Log.WithError(err).Error("Invalid book ID")
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
 	}
 	if err := h.Service.DeleteBook(id); err != nil {
+		h.Log.WithError(err).WithField("book_id", id).Error("Failed to delete book")
 		http.Error(w, "Error deleting book", http.StatusInternalServerError)
 		return
 	}
@@ -153,8 +166,10 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // responseWithJSON sends a JSON response with the given status code
-func responseWithJSON(w http.ResponseWriter, data interface{}, status int) {
+func (h *BookHandler) responseWithJSON(w http.ResponseWriter, data interface{}, status int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(data)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		h.Log.WithError(err).Error("Failed to encode response to JSON")
+	}
 }
