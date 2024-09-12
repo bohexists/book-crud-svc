@@ -10,11 +10,20 @@ type BookRepository struct {
 	DB *sql.DB
 }
 
-// NewBookRepository создает новый экземпляр BookRepository
-func NewBookRepository(db *sql.DB) *BookRepository {
+// NewBookRepository создает новый BookRepository
+func NewBookRepository(db *sql.DB) BookRepositoryInterface {
 	return &BookRepository{
 		DB: db,
 	}
+}
+
+// BookRepositoryInterface интерфейс для работы с базой данных по книгам
+type BookRepositoryInterface interface {
+	GetBooks() ([]domain.Book, error)
+	GetBook(id int) (domain.Book, error)
+	CreateBook(book domain.Book) (domain.Book, error)
+	UpdateBook(id int, book domain.Book) error
+	DeleteBook(id int) error
 }
 
 // GetBooks извлекает все книги из базы данных

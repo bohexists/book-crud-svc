@@ -22,6 +22,14 @@ func NewBookHandler(service *service.BookService) *BookHandler {
 	}
 }
 
+type BookServiceInterface interface {
+	GetBooks() ([]domain.Book, error)
+	GetBook(id int) (domain.Book, error)
+	CreateBook(book domain.Book) (domain.Book, error)
+	UpdateBook(id int, book domain.Book) error
+	DeleteBook(id int) error
+}
+
 // GetBooks godoc
 // @Summary Get all books
 // @Description Get all books from the database
