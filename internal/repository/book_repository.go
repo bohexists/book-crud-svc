@@ -31,6 +31,8 @@ type BookRepositoryInterface interface {
 
 // GetBooks извлекает все книги из базы данных
 func (r *BookRepository) GetBooks() ([]domain.Book, error) {
+
+	// SELECT id, title, description, author, published, price FROM books
 	rows, err := r.DB.Query("SELECT id, title, description, author, published, price FROM books")
 	if err != nil {
 		r.Log.WithError(err).Error("Failed to fetch books")
@@ -39,7 +41,10 @@ func (r *BookRepository) GetBooks() ([]domain.Book, error) {
 
 	defer rows.Close()
 
+	// Initialize an empty slice to hold the books
 	var books []domain.Book
+
+	// Add the data to the cache
 	for rows.Next() {
 		var book domain.Book
 		r.Log.WithError(err).Error("Failed to fetch books")
@@ -54,7 +59,9 @@ func (r *BookRepository) GetBooks() ([]domain.Book, error) {
 
 // GetBook извлекает одну книгу по ID
 func (r *BookRepository) GetBook(id int) (domain.Book, error) {
+	// Initialize an empty book
 	var book domain.Book
+	// SELECT id, title, description, author, published, price FROM books WHERE id = $1
 	err := r.DB.QueryRow("SELECT id, title, description, author, published, price FROM books WHERE id = $1", id).Scan(
 		&book.ID, &book.Title, &book.Description, &book.Author, &book.Published, &book.Price)
 	if err != nil {
@@ -66,6 +73,7 @@ func (r *BookRepository) GetBook(id int) (domain.Book, error) {
 
 // CreateBook добавляет новую книгу в базу данных
 func (r *BookRepository) CreateBook(book domain.Book) (domain.Book, error) {
+	// INSERT INTO books (title, description, author, published, price) VALUES ($1, $2, $3, $4, $5) RETURNING id
 	err := r.DB.QueryRow("INSERT INTO books (title, description, author, published, price) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		book.Title, book.Description, book.Author, book.Published, book.Price).Scan(&book.ID)
 	if err != nil {
@@ -77,6 +85,7 @@ func (r *BookRepository) CreateBook(book domain.Book) (domain.Book, error) {
 
 // UpdateBook обновляет существующую книгу
 func (r *BookRepository) UpdateBook(id int, book domain.Book) error {
+	// UPDATE books SET title=$1, description=$2, author=$3, published=$4, price=$5 WHERE id=$6
 	_, err := r.DB.Exec("UPDATE books SET title=$1, description=$2, author=$3, published=$4, price=$5 WHERE id=$6",
 		book.Title, book.Description, book.Author, book.Published, book.Price, id)
 	if err != nil {
@@ -88,6 +97,7 @@ func (r *BookRepository) UpdateBook(id int, book domain.Book) error {
 
 // DeleteBook удаляет книгу по ID
 func (r *BookRepository) DeleteBook(id int) error {
+	// DELETE FROM books WHERE id = $1
 	_, err := r.DB.Exec("DELETE FROM books WHERE id = $1", id)
 	if err != nil {
 		r.Log.WithError(err).Errorf("Failed to delete book with ID: %d", id)
