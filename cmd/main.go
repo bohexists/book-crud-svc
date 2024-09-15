@@ -36,12 +36,12 @@ func main() {
 		log.WithError(err).Fatal("Failed to load .env file")
 	}
 
-	err = logrus.New()
+	log = logrus.New()
 
 	// Initialize the database connection
 	db := repository.SetupDatabase()
 	// Create a new repository
-	repo := repository.NewBookRepository(db)
+	repo := repository.NewBookRepository(db, log)
 	// Create a new service
 	bookService := service.NewBookService(repo)
 	// Create a new router
