@@ -17,10 +17,9 @@ import (
 var log = logrus.New()
 
 func init() {
-	// Настройка logrus для вывода в JSON
+	// Set up the log formatter
 	log.Formatter = &logrus.JSONFormatter{}
-
-	// Уровень логирования можно настроить через переменную окружения
+	// Set up the log level
 	logLevel, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
 	if err != nil {
 		log.Level = logrus.InfoLevel // Уровень по умолчанию
@@ -36,16 +35,18 @@ func main() {
 		log.WithError(err).Fatal("Failed to load .env file")
 	}
 
+	// Initialize the logger
 	log = logrus.New()
-
 	// Initialize the database connection
 	db := repository.SetupDatabase()
-	// Create a new repository
-	repo := repository.NewBookRepository(db, log)
-	// Create a new service
-	bookService := service.NewBookService(repo)
+	// Create a new repository for books
+	bookRepo := repository.NewBookRepository(db, log)
+	// Create a new repository for users (used for authentication)
+	userRepo := repository.NewUserRepository(db)
+	// Create a new service for books
+	bookService := service.NewBookService(bookRepo)
 	// Create a new router
-	router := api.NewRouter(bookService)
+	router := api.NewRouter(bookService, userRepo)
 
 	// Start the server
 	log.Println("Server is running on port", os.Getenv("PORT"))
