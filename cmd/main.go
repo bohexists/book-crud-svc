@@ -17,10 +17,9 @@ import (
 var log = logrus.New()
 
 func init() {
-	// Настройка logrus для вывода в JSON
+	// Set up the log formatter
 	log.Formatter = &logrus.JSONFormatter{}
-
-	// Уровень логирования можно настроить через переменную окружения
+	// Set up the log level
 	logLevel, err := logrus.ParseLevel(os.Getenv("LOG_LEVEL"))
 	if err != nil {
 		log.Level = logrus.InfoLevel // Уровень по умолчанию
