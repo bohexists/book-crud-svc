@@ -30,7 +30,7 @@ type BookRepositoryInterface interface {
 }
 
 // GetBooks извлекает все книги из базы данных
-func (r *BookRepository) GetBooks() ([]domain.Book, error) {
+func (r BookRepository) GetBooks() ([]domain.Book, error) {
 
 	// SELECT id, title, description, author, published, price FROM books
 	rows, err := r.DB.Query("SELECT id, title, description, author, published, price FROM books")
@@ -58,7 +58,7 @@ func (r *BookRepository) GetBooks() ([]domain.Book, error) {
 }
 
 // GetBook извлекает одну книгу по ID
-func (r *BookRepository) GetBook(id int) (domain.Book, error) {
+func (r BookRepository) GetBook(id int) (domain.Book, error) {
 	// Initialize an empty book
 	var book domain.Book
 	// SELECT id, title, description, author, published, price FROM books WHERE id = $1
@@ -72,7 +72,7 @@ func (r *BookRepository) GetBook(id int) (domain.Book, error) {
 }
 
 // CreateBook добавляет новую книгу в базу данных
-func (r *BookRepository) CreateBook(book domain.Book) (domain.Book, error) {
+func (r BookRepository) CreateBook(book domain.Book) (domain.Book, error) {
 	// INSERT INTO books (title, description, author, published, price) VALUES ($1, $2, $3, $4, $5) RETURNING id
 	err := r.DB.QueryRow("INSERT INTO books (title, description, author, published, price) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		book.Title, book.Description, book.Author, book.Published, book.Price).Scan(&book.ID)
@@ -84,7 +84,7 @@ func (r *BookRepository) CreateBook(book domain.Book) (domain.Book, error) {
 }
 
 // UpdateBook обновляет существующую книгу
-func (r *BookRepository) UpdateBook(id int, book domain.Book) error {
+func (r BookRepository) UpdateBook(id int, book domain.Book) error {
 	// UPDATE books SET title=$1, description=$2, author=$3, published=$4, price=$5 WHERE id=$6
 	_, err := r.DB.Exec("UPDATE books SET title=$1, description=$2, author=$3, published=$4, price=$5 WHERE id=$6",
 		book.Title, book.Description, book.Author, book.Published, book.Price, id)
@@ -96,7 +96,7 @@ func (r *BookRepository) UpdateBook(id int, book domain.Book) error {
 }
 
 // DeleteBook удаляет книгу по ID
-func (r *BookRepository) DeleteBook(id int) error {
+func (r BookRepository) DeleteBook(id int) error {
 	// DELETE FROM books WHERE id = $1
 	_, err := r.DB.Exec("DELETE FROM books WHERE id = $1", id)
 	if err != nil {

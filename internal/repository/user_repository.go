@@ -13,7 +13,7 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{DB: db}
 }
 
-func (r *UserRepository) GetUserByUsername(username string) (*domain.User, error) {
+func (r UserRepository) GetUserByUsername(username string) (*domain.User, error) {
 	var user domain.User
 	err := r.DB.QueryRow("SELECT id, username, password, role FROM users WHERE username = $1", username).Scan(
 		&user.ID, &user.Username, &user.Password, &user.Role,

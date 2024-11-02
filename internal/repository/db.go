@@ -27,7 +27,7 @@ func SetupDatabase() *sql.DB {
 		log.Fatalf("Error loading %s file", envFile)
 	}
 	// Connect to the database
-	connStr := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+	connStr := fmt.Sprintf("host=%s port=%s repositorys=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("DB_HOST"),
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_USER"),

@@ -24,7 +24,7 @@ func LoadSecret() string {
 	return secret
 }
 
-// GenerateJWT generates a JWT token for a given user.
+// GenerateJWT generates a JWT token for a given repositorys.
 func GenerateJWT(username string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &JWTClaims{

@@ -43,7 +43,7 @@ func main() {
 	bookRepo := repository.NewBookRepository(db, log)
 	// Create a new repository for users (used for authentication)
 	userRepo := repository.NewUserRepository(db)
-	// Create a new service for books
+	// Create a new services for books
 	bookService := service.NewBookService(bookRepo)
 	// Create a new router
 	router := api.NewRouter(bookService, userRepo)

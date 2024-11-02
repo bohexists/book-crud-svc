@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// BookHandler is a handler for books
+// BookHandler is a handlers for books
 type BookHandler struct {
 	Service BookServiceInterface // Service for books
 	Log     *logrus.Logger       // Logger for books
@@ -43,7 +43,7 @@ type BookServiceInterface interface {
 // @Success 200 {array} domain.Book
 // @Router /books [get]
 // @Security ApiKeyAuth
-func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
+func (h BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 	// Get all books
 	books, err := h.Service.GetBooks()
 	// Check if there was an error
@@ -66,7 +66,7 @@ func (h *BookHandler) GetBooks(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {object} domain.Book
 // @Router /books/{id} [get]
 // @Security ApiKeyAuth
-func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
+func (h BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 	// Get the ID from the URL
 	vars := mux.Vars(r)
 	// Convert the ID from string to int
@@ -99,7 +99,7 @@ func (h *BookHandler) GetBook(w http.ResponseWriter, r *http.Request) {
 // @Success 201 {object} domain.Book
 // @Router /books [post]
 // @Security ApiKeyAuth
-func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
+func (h BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	// Get the request body
 	var book domain.Book
 	// Decode the request body into a Book struct
@@ -131,7 +131,7 @@ func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 // @Success 204
 // @Router /books/{id} [put]
 // @Security ApiKeyAuth
-func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
+func (h BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	// Get the book ID from the URL parameter
 	vars := mux.Vars(r)
 	// Get the book ID from the URL parameter
@@ -150,7 +150,7 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	// Call the service layer to update the book
+	// Call the services layer to update the book
 	err = h.Service.UpdateBook(id, book)
 	// Check if the book ID is valid
 	if err != nil {
@@ -172,7 +172,7 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 // @Success 204
 // @Router /books/{id} [delete]
 // @Security ApiKeyAuth
-func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
+func (h BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	// Get the book ID from the URL path
 	vars := mux.Vars(r)
 	// Get the book ID from the URL path
@@ -183,7 +183,7 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid book ID", http.StatusBadRequest)
 		return
 	}
-	// Delete the book from the service
+	// Delete the book from the services
 	if err := h.Service.DeleteBook(id); err != nil {
 		h.Log.WithError(err).WithField("book_id", id).Error("Failed to delete book")
 		http.Error(w, "Error deleting book", http.StatusInternalServerError)
@@ -194,7 +194,7 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 }
 
 // responseWithJSON sends a JSON response with the given status code
-func (h *BookHandler) responseWithJSON(w http.ResponseWriter, data interface{}, status int) {
+func (h BookHandler) responseWithJSON(w http.ResponseWriter, data interface{}, status int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(data); err != nil {

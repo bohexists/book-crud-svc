@@ -16,7 +16,7 @@ func NewAuthHandler(userRepo *repository.UserRepository) *AuthHandler {
 	return &AuthHandler{UserRepo: userRepo}
 }
 
-func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+func (h AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var loginRequest struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
@@ -27,7 +27,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check user credentials from DB
+	// Check repositorys credentials from DB
 	user, err := h.UserRepo.GetUserByUsername(loginRequest.Username)
 	if err != nil || user.Password != loginRequest.Password {
 		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
